@@ -25,7 +25,22 @@ router_start_index = Router()
 
 @router.message(Command('start'))
 async def send_welcome(message: types.Message):
-    await message.answer("Send me a URL to either check its indexing status or request indexing. Use commands /check_index or /start_index followed by the URL.")
+    # Create each button and add them directly to the InlineKeyboardMarkup upon creation
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
+        [types.InlineKeyboardButton(text="Check Index Status", callback_data="check_index")],
+        [types.InlineKeyboardButton(text="Request Googlebot Visit", callback_data="start_index")]
+    ])
+    await message.answer("Choose an action:", reply_markup=keyboard)
+
+
+@router.callback_query()
+async def handle_callback_query(query: types.CallbackQuery):
+    if query.data == "check_index":
+        await query.message.answer("Please send a text file with URLs to check their index status.")
+    elif query.data == "start_index":
+        await query.message.answer("Please send a text file with URLs for Googlebot visits.")
+    await query.answer()   # Close the callback query loading state
+
 
 # Function to send files via HTTP directly using requests
 async def send_file_via_http(chat_id, file_path, token):
@@ -62,6 +77,7 @@ async def handle_check_index_document(message: types.Message):
             await message.answer("Error: Result file does not exist.")
     else:
         await message.answer("Please send a text file with the .txt extension.")
+
 
 # Handler for simulating Googlebot visits from a text file
 @router_start_index.message(Command('start_index'))
@@ -118,7 +134,7 @@ async def check_indexing(filename):
             status = "Indexed" if indexed else "Not indexed"
             data['URL'].append(url)
             data['Status'].append(status)
-            time.sleep(8)  # Delay to prevent rate limiting
+            time.sleep(9)  # Delay to prevent rate limiting
 
     df = pd.DataFrame(data)
     df.to_excel('_results.xlsx', index=False)
