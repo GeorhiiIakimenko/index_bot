@@ -12,7 +12,7 @@ import aiofiles
 import time
 import requests
 
-API_TOKEN = '7010458179:AAG5iRfYAPph_d-fSq8phkoUhP1iYBRt7v0'
+API_TOKEN = 'token'
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
